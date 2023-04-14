@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -12,13 +13,13 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (kIsWeb) {
     await Firebase.initializeApp(
-        options: const FirebaseOptions(
-            apiKey: 'AIzaSyCQNzmr8jevLTNK8xZmHZK5TbyF_Cch50Q',
-            appId: '1:1057843305734:web:a68a2802d66de4a7169287',
-            messagingSenderId: '1057843305734',
-            projectId: 'instagram-clone-e89ef',
-            storageBucket: "instagram-clone-e89ef.appspot.com",
-        ),
+      options: const FirebaseOptions(
+        apiKey: 'AIzaSyCQNzmr8jevLTNK8xZmHZK5TbyF_Cch50Q',
+        appId: '1:1057843305734:web:a68a2802d66de4a7169287',
+        messagingSenderId: '1057843305734',
+        projectId: 'instagram-clone-e89ef',
+        storageBucket: "instagram-clone-e89ef.appspot.com",
+      ),
     );
   } else {
     await Firebase.initializeApp();
@@ -41,7 +42,31 @@ class MyApp extends StatelessWidget {
       //   mobileScreenLayout: MobileScreenLayout(),
       //   webScreenLayout: WebScreenLayout(),
       // ),
-      home: LoginScreen(),
+      home: StreamBuilder(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.active) {
+            if (snapshot.hasData) {
+              return const ResponsiveLayout(
+                mobileScreenLayout: MobileScreenLayout(),
+                webScreenLayout: WebScreenLayout(),
+              );
+            } else if (snapshot.hasError) {
+              return Center(
+                child: Text('${snapshot.error}'),
+              );
+            }
+          }
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(
+                color: primaryColor,
+              ),
+            );
+          }
+          return const LoginScreen();
+        },
+      ),
     );
   }
 }
