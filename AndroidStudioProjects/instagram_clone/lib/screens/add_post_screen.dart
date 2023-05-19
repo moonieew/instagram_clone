@@ -1,4 +1,5 @@
 
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
@@ -10,6 +11,7 @@ import 'package:provider/provider.dart';
 import '../providers/user_provider.dart';
 import '../resources/firestore_methods.dart';
 import '../utils/utils.dart';
+import 'confirm_screen.dart';
 
 class AddPostScreen extends StatefulWidget {
   const AddPostScreen({Key? key}) : super(key: key);
@@ -22,6 +24,20 @@ class _AddPostScreenState extends State<AddPostScreen> {
   Uint8List? _file;
   bool isLoading = false;
   final TextEditingController _descriptionController = TextEditingController();
+
+  pickVideo(ImageSource src, BuildContext context) async {
+    final video = await ImagePicker().pickVideo(source: src);
+    if (video != null) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => ConfirmScreen(
+            videoFile: File(video.path),
+            videoPath: video.path,
+          ),
+        ),
+      );
+    }
+  }
 
   _selectImage(BuildContext parentContext) async {
     return showDialog(
@@ -40,6 +56,21 @@ class _AddPostScreenState extends State<AddPostScreen> {
                     _file = file;
                   });
                 }),
+            SimpleDialogOption(
+              onPressed: () => pickVideo(ImageSource.gallery, context),
+              child: Row(
+                children: const [
+                  Icon(Icons.video_library_rounded),
+                  Padding(
+                    padding: EdgeInsets.all(7.0),
+                    child: Text(
+                      'Post a Video Story',
+                      style: TextStyle(fontSize: 14),
+                    ),
+                  ),
+                ],
+              ),
+            ),
             SimpleDialogOption(
                 padding: const EdgeInsets.all(20),
                 child: const Text('Choose from Gallery'),

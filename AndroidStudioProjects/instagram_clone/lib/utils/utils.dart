@@ -13,6 +13,8 @@ pickImage(ImageSource source) async {
   print('No Image Selected');
 }
 
+// for picking up video from gallery
+
 // for displaying snackbars
 showSnackBar(BuildContext context, String text) {
   return ScaffoldMessenger.of(context).showSnackBar(
